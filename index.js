@@ -33,8 +33,8 @@ app.post('/api/login', async (req, res) => {
     if (!validPassword) {
       return res.status(401).json({ message: 'Clave incorrecta' });
     }
-
-    res.json({ message: '¡Login exitoso!', user: { nombre: user.nombre } });
+     console.log("Rol del usuario:", user.rol_id);
+    return res.json({ message: '¡Login exitoso!', user: { nombre: user.nombre, rol :user.rol_id } });
 
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -144,7 +144,7 @@ app.post('/api/viajes', async (req, res) => {
 
 // Cambia la última línea por esta:
 const PORT = 3000;
-app.listen(PORT, '192.168.1.226', () => {
+app.listen(PORT, '10.229.117.220', () => {
   console.log(`Backend corriendo en: http://localhost:${PORT}`);
   console.log(`Accesible en tu red local en: http://TU_IP_DE_PC:${PORT}`);
 });
