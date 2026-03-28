@@ -5,7 +5,11 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const app = express();
-app.use(cors()); // ¡IMPORTANTE! Sin esto Angular no podrá conectar
+app.use(cors({
+  origin: '*', // Permite peticiones desde cualquier IP (como la de tu celular)
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 // Ruta de Login
@@ -81,4 +85,66 @@ app.get('/api/viajes', async (req, res) => {
   }
 });
 
-app.listen(3000, () => console.log("Backend corriendo en el puerto 3000"));
+
+
+// NUEVA RUTA: Insertar Viaje desde la Mina
+app.post('/api/viajes', async (req, res) => {
+  const { 
+    empresa_id, 
+    tracto_id, 
+    operador_id, 
+    mina_id, 
+    producto, 
+    cantidad_m3, 
+    observaciones_mina 
+  } = req.body;
+
+  // El usuario_mina_id se asigna según tu lógica de sesión o negocio (en este caso fijo en 3)
+  //Se va cambiar cuando se tenga el incio de sesion hacia esta pantalla
+  const usuario_mina_id = 3; 
+  const fecha_viaje = new Date().toISOString().split('T')[0]; // YYYY-MM-DD local
+
+  try {
+    const query = `
+      INSERT INTO viajes (
+        empresa_id, 
+        tracto_id, 
+        operador_id, 
+        mina_id, 
+        usuario_mina_id, 
+        producto, 
+        cantidad_m3, 
+        fecha_viaje, 
+        observaciones_mina
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const [result] = await db.query(query, [
+      empresa_id,
+      tracto_id,
+      operador_id,
+      mina_id,
+      usuario_mina_id,
+      producto || 'Material Pétreo',
+      cantidad_m3,
+      fecha_viaje,
+      observaciones_mina || null
+    ]);
+
+    res.status(201).json({ 
+      message: 'Viaje registrado con éxito', 
+      folio: result.insertId 
+    });
+
+  } catch (error) {
+    console.error("Error al registrar viaje:", error);
+    res.status(500).json({ error: 'Hubo un problema al registrar el viaje en la base de datos' });
+  }
+});
+
+// Cambia la última línea por esta:
+const PORT = 3000;
+app.listen(PORT, '192.168.1.226', () => {
+  console.log(`Backend corriendo en: http://localhost:${PORT}`);
+  console.log(`Accesible en tu red local en: http://TU_IP_DE_PC:${PORT}`);
+});
