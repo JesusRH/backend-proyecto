@@ -143,8 +143,20 @@ app.post('/api/viajes', async (req, res) => {
 });
 
 // Cambia la última línea por esta:
-const PORT = 3000;
+/*const PORT = 3000;
 app.listen(PORT, '10.229.117.220', () => {
   console.log(`Backend corriendo en: http://localhost:${PORT}`);
   console.log(`Accesible en tu red local en: http://TU_IP_DE_PC:${PORT}`);
 });
+*/
+// 1. Configuración del puerto y el listen (Solo para desarrollo local)
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = 3000;
+  // Usamos '0.0.0.0' para que sea accesible en tu red local si pruebas en casa
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Backend corriendo localmente en: http://localhost:${PORT}`);
+  });
+}
+
+// 2. EXPORTAR LA APP (Crucial para que Vercel la reconozca)
+module.exports = app;
